@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lop-backend
+  namespace: life-observability-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lop-backend
+  template:
+    metadata:
+      labels:
+        app: lop-backend
+    spec:
+      containers:
+        - name: backend
+          image: ghcr.io/your-org/lop-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              name: http
+          env:
+            - name: ENVIRONMENT
+              value: production
+            - name: DEBUG
+              value: "false"
+            - name: ACCESS_TOKEN_TTL_HOURS
+              value: "24"
+            - name: JWT_ALGORITHM
+              value: HS256
+            - name: JWT_ISSUER
+              value: life-observability-platform
+            - name: UVICORN_RELOAD
+              value: "false"
+            - name: AUTO_SEED_DEMO_DATA
+              value: "false"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: lop-app-secrets
+                  key: DATABASE_URL
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: lop-app-secrets
+                  key: SECRET_KEY
+            - name: CORS_ORIGINS
+              valueFrom:
+                secretKeyRef:
+                  name: lop-app-secrets
+                  key: CORS_ORIGINS
+            - name: GITHUB_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: lop-app-secrets
+                  key: GITHUB_API_TOKEN
+                  optional: true
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lop-backend
+  namespace: life-observability-platform
+spec:
+  selector:
+    app: lop-backend
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http

@@ -17,10 +17,16 @@ def get_current_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(security_scheme),
     db: Session = Depends(get_db_session),
 ) -> User:
+    settings = get_settings()
     if credentials is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required.")
 
-    payload = decode_access_token(credentials.credentials, get_settings().secret_key)
+    payload = decode_access_token(
+        credentials.credentials,
+        settings.secret_key,
+        issuer=settings.jwt_issuer,
+        algorithm=settings.jwt_algorithm,
+    )
     if payload is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token.")
 

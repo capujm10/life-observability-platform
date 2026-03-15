@@ -19,11 +19,16 @@ def login(payload: LoginRequest, db: Session = Depends(get_db_session)) -> Token
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password.")
 
     settings = get_settings()
-    token = create_access_token(str(user.id), settings.secret_key, settings.access_token_ttl_hours)
+    token = create_access_token(
+        str(user.id),
+        settings.secret_key,
+        settings.access_token_ttl_hours,
+        issuer=settings.jwt_issuer,
+        algorithm=settings.jwt_algorithm,
+    )
     return TokenResponse(access_token=token, user=UserRead.model_validate(user))
 
 
 @router.get("/me", response_model=UserRead)
 def me(user: User = Depends(get_current_user)) -> UserRead:
     return UserRead.model_validate(user)
-

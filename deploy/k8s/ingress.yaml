@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: lop-ingress
+  namespace: life-observability-platform
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: lop.example.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: lop-backend
+                port:
+                  number: 8000
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: lop-frontend
+                port:
+                  number: 3000

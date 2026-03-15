@@ -8,59 +8,61 @@ Alternative taglines:
 
 ## Project Overview
 
-Life Observability Platform (LOP) is a full-stack productivity platform that applies observability-inspired thinking to personal execution. It brings together tasks, habits, journaling, project tracking, weekly insights, and GitHub activity into a single operating surface so you can monitor behavior, identify patterns, and improve with signal instead of guesswork.
+Life Observability Platform (LOP) is a full-stack personal productivity and analytics application built around observability-inspired feedback loops. It combines tasks, habits, journaling, projects, metrics, weekly insights, and GitHub activity into a single operating surface so individual execution can be measured, reviewed, and improved over time.
 
-The product is designed as a portfolio-ready MVP with a clean separation between frontend, API, analytics services, and persistence. It supports day-to-day execution while also surfacing higher-level personal analytics such as throughput, consistency, reflection cadence, delivery momentum, and weekly trend summaries.
+The repository is structured as a production-minded MVP: a Next.js frontend, a FastAPI backend, PostgreSQL persistence, containerized local development, JWT-based authentication, a CI pipeline, and initial k3s deployment manifests. The architecture stays intentionally simple while still being organized for extension.
 
-## Features
-
-- Unified dashboard for tasks, habits, journaling, projects, and metrics
-- Observability-style metrics system built on event and snapshot data
-- Task, habit, journal, and project CRUD workflows
-- Weekly summary and weekly insights analytics
-- GitHub activity sync integration for repository and commit events
-- Settings and theme preferences
-- Demo authentication flow for local evaluation
-- PostgreSQL-backed data model with Alembic migrations
-- Docker-based local development for frontend, backend, and database services
-
-## Architecture
+## Architecture Summary
 
 ### Frontend
 
 - Next.js App Router
 - TypeScript
 - Tailwind CSS
-- Typed API client layer and reusable UI components
+- Typed API layer and client-side auth/session handling
 
 ### Backend
 
 - FastAPI REST API
-- SQLAlchemy ORM models and service layer
-- Pydantic schemas
+- SQLAlchemy ORM
+- Pydantic schemas and settings
 - Alembic migrations
+- Service layer for analytics, summaries, and event processing
 
-### Data and Analytics
+### Data and Platform
 
-- PostgreSQL persistence
-- Event-based metrics for actions such as completions, journal activity, project updates, and GitHub syncs
-- Snapshot-based personal analytics for focus time and related trends
-- Weekly aggregation services for summaries and insights
+- PostgreSQL for application data
+- Event-based metrics and snapshot analytics
+- Docker Compose for local orchestration
+- GitHub Actions CI
+- Initial k3s manifests under `deploy/k8s`
 
-### Infrastructure
+## Key Features
 
-- Docker and Docker Compose for local orchestration
-- Separate frontend, backend, and database containers
-- Environment-based configuration for local and containerized development
+- Dashboard for tasks, habits, projects, journal prompts, and execution health
+- Task, habit, journal, and project CRUD workflows
+- Observability-style metrics dashboard backed by events and snapshots
+- Weekly summary and weekly insights analytics
+- GitHub activity sync integration for repository and commit events
+- JWT-based authentication with protected API routes
+- Dockerized local development and portfolio-ready CI validation
 
-## Tech Stack
+## Authentication Notes
 
-- Frontend: Next.js 16.1.6, React 19, TypeScript, Tailwind CSS
-- Backend: FastAPI, SQLAlchemy, Pydantic Settings, Alembic, Uvicorn
-- Database: PostgreSQL
-- Tooling: Docker, Docker Compose, pytest, ESLint
+- `POST /api/v1/auth/login` returns a bearer JWT access token
+- `GET /api/v1/auth/me` returns the authenticated user profile
+- Protected API routes use the shared FastAPI bearer-token dependency
+- Passwords are stored as PBKDF2 hashes
+- Local development still supports a seeded demo user for evaluation
 
-## Local Setup
+Relevant backend auth settings:
+
+- `SECRET_KEY`
+- `ACCESS_TOKEN_TTL_HOURS`
+- `JWT_ALGORITHM`
+- `JWT_ISSUER`
+
+## Local Development
 
 Create local environment files from the bundled examples:
 
@@ -90,16 +92,11 @@ python scripts/seed.py
 uvicorn app.main:app --reload
 ```
 
-On Windows PowerShell:
+Backend validation:
 
-```powershell
-cd backend
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-pip install -e .[dev]
-alembic upgrade head
-python scripts/seed.py
-uvicorn app.main:app --reload
+```bash
+python -m pytest tests -q
+python -m compileall app tests
 ```
 
 ### Frontend
@@ -110,22 +107,35 @@ npm install
 npm run dev
 ```
 
-When the seed script has been run, use the prefilled demo credentials on the login screen to inspect the platform state.
+Frontend validation:
 
-## Docker Setup
+```bash
+npm run lint
+npx tsc --noEmit
+npm run build
+```
 
-Run the full stack with Docker Compose:
+For local evaluation, the seeded demo user remains available and the login form is prefilled in the current MVP.
+
+## Docker Instructions
+
+Run the full local stack with Docker Compose:
 
 ```bash
 docker compose up --build
 ```
 
-Available services:
+Services:
 
 - Frontend: `http://localhost:3000`
 - Backend: `http://localhost:8000`
 - API docs: `http://localhost:8000/api/v1/docs`
 - PostgreSQL: `localhost:5432`
+
+Notes:
+
+- The frontend Docker image is production-oriented by default
+- `docker-compose.yml` overrides runtime commands so local development still uses the Next.js dev server and FastAPI reload mode
 
 Helpful shortcuts:
 
@@ -135,7 +145,43 @@ make down
 make logs
 make backend-seed
 make backend-test
+make frontend-lint
 ```
+
+## CI Summary
+
+GitHub Actions workflow: `.github/workflows/ci.yml`
+
+The pipeline includes:
+
+- Backend dependency install, pytest, and `compileall`
+- Frontend `npm ci`, lint, TypeScript check, and production build
+- Docker Compose configuration validation with temporary env files
+
+## k3s Deployment Summary
+
+Initial manifests live under `deploy/k8s`:
+
+- `namespace.yaml`
+- `secret.example.yaml`
+- `postgres-pvc.yaml`
+- `postgres.yaml`
+- `backend.yaml`
+- `frontend.yaml`
+- `ingress.yaml`
+
+Suggested apply order:
+
+1. Create the namespace.
+2. Copy `secret.example.yaml`, replace placeholder values, and apply the real secret.
+3. Build and push backend and frontend images, then replace the placeholder image references in the manifests.
+4. Apply the PVC, Postgres, backend, frontend, and ingress manifests.
+
+The current manifests target a lightweight ingress-based k3s setup with:
+
+- `lop-postgres`
+- `lop-backend`
+- `lop-frontend`
 
 ## API Overview
 
@@ -157,11 +203,11 @@ Key REST endpoints under `/api/v1`:
 - `POST /integrations/github/sync`
 - `GET|PUT /settings`
 
-## Future Improvements / Roadmap
+## Roadmap / Future Improvements
 
-1. Replace demo authentication with production-grade auth and session management.
-2. Add richer analytics visualizations, anomaly detection, and longitudinal reporting.
-3. Introduce background jobs for sync ingestion, summary generation, and scheduled analytics.
-4. Expand integrations beyond GitHub to calendar, notes, and knowledge systems.
-5. Add CI for backend tests, frontend lint/typecheck/build, and container validation.
-6. Harden deployment targets with environment-specific infrastructure and release workflows.
+1. Add refresh tokens, session rotation, and revocation support if the product moves beyond single-user MVP usage.
+2. Expand analytics with richer trend views, anomaly detection, and longer-range reporting.
+3. Move sync and summary workloads into background jobs.
+4. Add more integrations such as calendar, notes, and personal knowledge systems.
+5. Add image publishing and deployment automation for k3s or other target platforms.
+6. Harden secret management, ingress TLS, backups, and environment promotion workflows.

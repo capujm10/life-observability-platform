@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lop-frontend
+  namespace: life-observability-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lop-frontend
+  template:
+    metadata:
+      labels:
+        app: lop-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: ghcr.io/your-org/lop-frontend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: NEXT_PUBLIC_API_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: lop-app-secrets
+                  key: NEXT_PUBLIC_API_BASE_URL
+          readinessProbe:
+            httpGet:
+              path: /login
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /login
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lop-frontend
+  namespace: life-observability-platform
+spec:
+  selector:
+    app: lop-frontend
+  ports:
+    - name: http
+      port: 3000
+      targetPort: http

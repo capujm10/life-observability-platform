@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     secret_key: str = "change-me-in-production"
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
     access_token_ttl_hours: int = 24
+    jwt_algorithm: str = "HS256"
+    jwt_issuer: str = "life-observability-platform"
     auto_seed_demo_data: bool = True
     demo_user_email: str = "demo@personalos.local"
     demo_user_password: str = "demo123"
