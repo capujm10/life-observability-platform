@@ -13,7 +13,7 @@ spec:
       labels:
         app: lop-frontend
     spec:
-      # Uncomment and create this secret if the GHCR package is private.
+      # Uncomment this block if the GHCR package is private.
       # imagePullSecrets:
       #   - name: ghcr-pull-secret
       containers:
@@ -37,12 +37,16 @@ spec:
               port: http
             initialDelaySeconds: 10
             periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
           livenessProbe:
             httpGet:
               path: /login
               port: http
             initialDelaySeconds: 20
             periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
           resources:
             requests:
               cpu: 100m

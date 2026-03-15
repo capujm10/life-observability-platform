@@ -224,6 +224,14 @@ The current manifests target a lightweight ingress-based k3s setup with:
 - `lop-backend`
 - `lop-frontend`
 
+### k3s Production Notes
+
+- Backend, frontend, and Postgres all include baseline readiness and liveness probes.
+- Backend and frontend ship with lightweight CPU and memory requests and limits, and Postgres now has a conservative starter resource budget as well.
+- Use `latest` only for simple MVP rollouts; pin a Git SHA tag for more predictable deployments.
+- Uncomment `imagePullSecrets` only if the GHCR packages are private.
+- Before deployment, you still need to set real secrets, a real ingress host, and any cluster-specific TLS or pull-secret configuration.
+
 ## API Overview
 
 Key REST endpoints under `/api/v1`:
