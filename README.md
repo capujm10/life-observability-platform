@@ -174,15 +174,15 @@ The image publishing workflow:
 
 Default image names:
 
-- `ghcr.io/<github-owner>/life-observability-platform-backend`
-- `ghcr.io/<github-owner>/life-observability-platform-frontend`
+- `ghcr.io/capujm10/life-observability-platform-backend`
+- `ghcr.io/capujm10/life-observability-platform-frontend`
 
 Example tags:
 
-- `ghcr.io/<github-owner>/life-observability-platform-backend:latest`
-- `ghcr.io/<github-owner>/life-observability-platform-backend:<git-sha>`
-- `ghcr.io/<github-owner>/life-observability-platform-frontend:latest`
-- `ghcr.io/<github-owner>/life-observability-platform-frontend:<git-sha>`
+- `ghcr.io/capujm10/life-observability-platform-backend:latest`
+- `ghcr.io/capujm10/life-observability-platform-backend:<git-sha>`
+- `ghcr.io/capujm10/life-observability-platform-frontend:latest`
+- `ghcr.io/capujm10/life-observability-platform-frontend:<git-sha>`
 
 GitHub requirements for publishing:
 
@@ -204,19 +204,19 @@ Initial manifests live under `deploy/k8s`:
 - `frontend.yaml`
 - `ingress.yaml`
 
-The backend and frontend deployment manifests are aligned with the published image names:
+The backend and frontend deployment manifests are already aligned with the published image names:
 
-- `ghcr.io/your-github-owner/life-observability-platform-backend:latest`
-- `ghcr.io/your-github-owner/life-observability-platform-frontend:latest`
+- `ghcr.io/capujm10/life-observability-platform-backend:latest`
+- `ghcr.io/capujm10/life-observability-platform-frontend:latest`
 
 Suggested apply order:
 
 1. Create the namespace.
 2. Copy `secret.example.yaml`, replace placeholder values, and apply the real secret.
-3. Replace `your-github-owner` or pin an exact SHA tag in `deploy/k8s/backend.yaml` and `deploy/k8s/frontend.yaml`.
+3. Customize the ingress host, real secrets, and optionally pin an exact SHA tag instead of `latest`.
 4. Apply the PVC, Postgres, backend, frontend, and ingress manifests.
 
-If the GHCR packages remain private, create an image pull secret in the cluster and wire it into the deployment or service account before rollout.
+If the GHCR packages remain private, create an image pull secret in the cluster and uncomment the `imagePullSecrets` block in `deploy/k8s/backend.yaml` and `deploy/k8s/frontend.yaml` before rollout.
 
 The current manifests target a lightweight ingress-based k3s setup with:
 

@@ -13,9 +13,12 @@ spec:
       labels:
         app: lop-backend
     spec:
+      # Uncomment and create this secret if the GHCR package is private.
+      # imagePullSecrets:
+      #   - name: ghcr-pull-secret
       containers:
         - name: backend
-          image: ghcr.io/your-github-owner/life-observability-platform-backend:latest
+          image: ghcr.io/capujm10/life-observability-platform-backend:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
