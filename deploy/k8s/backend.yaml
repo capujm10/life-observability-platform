@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: ghcr.io/your-org/lop-backend:latest
+          image: ghcr.io/your-github-owner/life-observability-platform-backend:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000

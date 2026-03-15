@@ -10,7 +10,7 @@ Alternative taglines:
 
 Life Observability Platform (LOP) is a full-stack personal productivity and analytics application built around observability-inspired feedback loops. It combines tasks, habits, journaling, projects, metrics, weekly insights, and GitHub activity into a single operating surface so individual execution can be measured, reviewed, and improved over time.
 
-The repository is structured as a production-minded MVP: a Next.js frontend, a FastAPI backend, PostgreSQL persistence, containerized local development, JWT-based authentication, a CI pipeline, and initial k3s deployment manifests. The architecture stays intentionally simple while still being organized for extension.
+The repository is structured as a production-minded MVP: a Next.js frontend, a FastAPI backend, PostgreSQL persistence, containerized local development, JWT-based authentication, GitHub Actions workflows, automated GHCR image publishing, and initial k3s deployment manifests.
 
 ## Architecture Summary
 
@@ -34,7 +34,7 @@ The repository is structured as a production-minded MVP: a Next.js frontend, a F
 - PostgreSQL for application data
 - Event-based metrics and snapshot analytics
 - Docker Compose for local orchestration
-- GitHub Actions CI
+- GitHub Actions CI and container publishing
 - Initial k3s manifests under `deploy/k8s`
 
 ## Key Features
@@ -45,7 +45,7 @@ The repository is structured as a production-minded MVP: a Next.js frontend, a F
 - Weekly summary and weekly insights analytics
 - GitHub activity sync integration for repository and commit events
 - JWT-based authentication with protected API routes
-- Dockerized local development and portfolio-ready CI validation
+- Dockerized local development, CI validation, and container image publishing
 
 ## Authentication Notes
 
@@ -134,8 +134,10 @@ Services:
 
 Notes:
 
+- The backend Dockerfile supports both local dev and publish flows through `INSTALL_DEV`
+- `docker-compose.yml` sets `INSTALL_DEV=true` and keeps local reload behavior
 - The frontend Docker image is production-oriented by default
-- `docker-compose.yml` overrides runtime commands so local development still uses the Next.js dev server and FastAPI reload mode
+- `docker-compose.yml` still overrides runtime commands so local development uses the Next.js dev server and FastAPI reload mode
 
 Helpful shortcuts:
 
@@ -150,13 +152,45 @@ make frontend-lint
 
 ## CI Summary
 
-GitHub Actions workflow: `.github/workflows/ci.yml`
+GitHub Actions workflows:
 
-The pipeline includes:
+- `.github/workflows/ci.yml`
+- `.github/workflows/publish-images.yml`
+
+The CI workflow includes:
 
 - Backend dependency install, pytest, and `compileall`
 - Frontend `npm ci`, lint, TypeScript check, and production build
 - Docker Compose configuration validation with temporary env files
+
+The image publishing workflow:
+
+- runs on `push` to `main`
+- builds separate backend and frontend production images
+- publishes to GitHub Container Registry
+- tags each image with `latest` and the full Git SHA
+
+## Published Images
+
+Default image names:
+
+- `ghcr.io/<github-owner>/life-observability-platform-backend`
+- `ghcr.io/<github-owner>/life-observability-platform-frontend`
+
+Example tags:
+
+- `ghcr.io/<github-owner>/life-observability-platform-backend:latest`
+- `ghcr.io/<github-owner>/life-observability-platform-backend:<git-sha>`
+- `ghcr.io/<github-owner>/life-observability-platform-frontend:latest`
+- `ghcr.io/<github-owner>/life-observability-platform-frontend:<git-sha>`
+
+GitHub requirements for publishing:
+
+- the workflow uses the built-in `GITHUB_TOKEN`
+- workflow permissions must allow `contents: read` and `packages: write`
+- for organization-owned repositories, GitHub Actions must be allowed to create and publish GHCR packages
+
+No custom registry secret is required for the workflow itself when publishing to GHCR.
 
 ## k3s Deployment Summary
 
@@ -170,12 +204,19 @@ Initial manifests live under `deploy/k8s`:
 - `frontend.yaml`
 - `ingress.yaml`
 
+The backend and frontend deployment manifests are aligned with the published image names:
+
+- `ghcr.io/your-github-owner/life-observability-platform-backend:latest`
+- `ghcr.io/your-github-owner/life-observability-platform-frontend:latest`
+
 Suggested apply order:
 
 1. Create the namespace.
 2. Copy `secret.example.yaml`, replace placeholder values, and apply the real secret.
-3. Build and push backend and frontend images, then replace the placeholder image references in the manifests.
+3. Replace `your-github-owner` or pin an exact SHA tag in `deploy/k8s/backend.yaml` and `deploy/k8s/frontend.yaml`.
 4. Apply the PVC, Postgres, backend, frontend, and ingress manifests.
+
+If the GHCR packages remain private, create an image pull secret in the cluster and wire it into the deployment or service account before rollout.
 
 The current manifests target a lightweight ingress-based k3s setup with:
 
@@ -209,5 +250,5 @@ Key REST endpoints under `/api/v1`:
 2. Expand analytics with richer trend views, anomaly detection, and longer-range reporting.
 3. Move sync and summary workloads into background jobs.
 4. Add more integrations such as calendar, notes, and personal knowledge systems.
-5. Add image publishing and deployment automation for k3s or other target platforms.
+5. Add automated environment deployment on top of the published container images.
 6. Harden secret management, ingress TLS, backups, and environment promotion workflows.

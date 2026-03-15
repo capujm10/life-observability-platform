@@ -19,6 +19,8 @@ services:
   backend:
     build:
       context: ./backend
+      args:
+        INSTALL_DEV: "true"
     container_name: lop-backend
     env_file:
       - ./.env
