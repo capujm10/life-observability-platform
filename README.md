@@ -216,7 +216,7 @@ Step-by-step deployment guide:
 Suggested apply order:
 
 1. Create the namespace.
-2. Copy `secret.example.yaml`, replace placeholder values, and apply the real secret.
+2. Copy `secret.example.yaml` to a real secret file, replace placeholder values, and apply that file.
 3. Customize the ingress host, real secrets, and optionally pin an exact SHA tag instead of `latest`.
 4. Apply the PVC, Postgres, backend, frontend, and ingress manifests.
 
@@ -240,7 +240,7 @@ The current manifests target a lightweight ingress-based k3s setup with:
 
 1. Publish images from `main` and decide on SHA-pinned image tags.
 2. Apply `deploy/k8s/namespace.yaml`.
-3. Prepare and apply `deploy/k8s/secret.example.yaml` with real values.
+3. Create a real secret manifest from `deploy/k8s/secret.example.yaml`, then apply it with real values.
 4. Create a GHCR pull secret only if the packages are private, then enable `imagePullSecrets`.
 5. Update `deploy/k8s/ingress.yaml` with the real host.
 6. Apply `postgres-pvc.yaml`, `postgres.yaml`, `backend.yaml`, `frontend.yaml`, and `ingress.yaml` in that order.

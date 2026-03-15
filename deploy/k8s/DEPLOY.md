@@ -31,7 +31,7 @@ kubectl apply -f deploy/k8s/namespace.yaml
 
 ## Step 2: Prepare the Application Secret
 
-Copy `deploy/k8s/secret.example.yaml` and replace:
+Copy `deploy/k8s/secret.example.yaml` to a real file such as `deploy/k8s/secret.yaml`, then replace:
 
 - `POSTGRES_PASSWORD`
 - `DATABASE_URL`
@@ -43,7 +43,9 @@ Copy `deploy/k8s/secret.example.yaml` and replace:
 Apply the secret:
 
 ```bash
-kubectl apply -f deploy/k8s/secret.example.yaml
+cp deploy/k8s/secret.example.yaml deploy/k8s/secret.yaml
+# edit deploy/k8s/secret.yaml
+kubectl apply -f deploy/k8s/secret.yaml
 ```
 
 ## Step 3: Optional GHCR Pull Secret
@@ -80,6 +82,8 @@ Example:
 
 - `ghcr.io/capujm10/life-observability-platform-backend:abc123...`
 - `ghcr.io/capujm10/life-observability-platform-frontend:def456...`
+
+The backend and frontend manifests include an inline comment above the image field as a reminder.
 
 ## Step 6: Apply Resources in Order
 

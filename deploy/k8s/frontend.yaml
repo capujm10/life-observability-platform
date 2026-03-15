@@ -18,6 +18,7 @@ spec:
       #   - name: ghcr-pull-secret
       containers:
         - name: frontend
+          # Replace :latest with a published Git SHA tag for real deployments.
           image: ghcr.io/capujm10/life-observability-platform-frontend:latest
           imagePullPolicy: IfNotPresent
           ports:
