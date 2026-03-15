@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f3f5ef;
+  --text: #19241d;
+  --muted: #667464;
+  --panel: rgba(255, 255, 255, 0.78);
+  --panel-strong: rgba(255, 255, 255, 0.95);
+  --sidebar: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(243, 247, 242, 0.92));
+  --border: rgba(25, 36, 29, 0.08);
+  --soft: rgba(15, 118, 110, 0.1);
+  --accent: #0f766e;
+  --accent-strong: #0a5e58;
+  --accent-soft: rgba(15, 118, 110, 0.14);
+  --success: #166534;
+  --success-soft: rgba(22, 101, 52, 0.12);
+  --warning: #b45309;
+  --warning-soft: rgba(180, 83, 9, 0.12);
+  --danger: #c2410c;
+  --danger-strong: #9a3412;
+  --danger-soft: rgba(194, 65, 12, 0.12);
+}
+
+[data-theme="dark"] {
+  --bg: #0b1512;
+  --text: #edf7f1;
+  --muted: #91a79d;
+  --panel: rgba(15, 25, 22, 0.86);
+  --panel-strong: rgba(20, 32, 28, 0.96);
+  --sidebar: linear-gradient(180deg, rgba(15, 25, 22, 0.95), rgba(11, 21, 18, 0.98));
+  --border: rgba(237, 247, 241, 0.08);
+  --soft: rgba(45, 212, 191, 0.12);
+  --accent: #2dd4bf;
+  --accent-strong: #14b8a6;
+  --accent-soft: rgba(45, 212, 191, 0.16);
+  --success: #4ade80;
+  --success-soft: rgba(74, 222, 128, 0.14);
+  --warning: #f59e0b;
+  --warning-soft: rgba(245, 158, 11, 0.14);
+  --danger: #fb923c;
+  --danger-strong: #ea580c;
+  --danger-soft: rgba(251, 146, 60, 0.16);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(15, 118, 110, 0.12), transparent 28%),
+    radial-gradient(circle at top right, rgba(234, 88, 12, 0.08), transparent 24%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 20%),
+    var(--bg);
+  color: var(--text);
+  font-family: "Aptos", "Segoe UI Variable", "Segoe UI", sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+code,
+pre {
+  font-family: "Cascadia Code", "IBM Plex Mono", "Consolas", monospace;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
