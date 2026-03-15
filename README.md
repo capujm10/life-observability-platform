@@ -209,6 +209,10 @@ The backend and frontend deployment manifests are already aligned with the publi
 - `ghcr.io/capujm10/life-observability-platform-backend:latest`
 - `ghcr.io/capujm10/life-observability-platform-frontend:latest`
 
+Step-by-step deployment guide:
+
+- `deploy/k8s/DEPLOY.md`
+
 Suggested apply order:
 
 1. Create the namespace.
@@ -231,6 +235,18 @@ The current manifests target a lightweight ingress-based k3s setup with:
 - Use `latest` only for simple MVP rollouts; pin a Git SHA tag for more predictable deployments.
 - Uncomment `imagePullSecrets` only if the GHCR packages are private.
 - Before deployment, you still need to set real secrets, a real ingress host, and any cluster-specific TLS or pull-secret configuration.
+
+### Quick Deployment Flow
+
+1. Publish images from `main` and decide on SHA-pinned image tags.
+2. Apply `deploy/k8s/namespace.yaml`.
+3. Prepare and apply `deploy/k8s/secret.example.yaml` with real values.
+4. Create a GHCR pull secret only if the packages are private, then enable `imagePullSecrets`.
+5. Update `deploy/k8s/ingress.yaml` with the real host.
+6. Apply `postgres-pvc.yaml`, `postgres.yaml`, `backend.yaml`, `frontend.yaml`, and `ingress.yaml` in that order.
+7. Verify pods, services, ingress, and rollout status with `kubectl get` and `kubectl rollout status`.
+8. Use `kubectl logs`, `kubectl describe`, and `kubectl get events` for troubleshooting.
+9. Roll out new versions with SHA-pinned tags via manifest updates or `kubectl set image`.
 
 ## API Overview
 
