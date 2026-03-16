@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: lop-ingress
+  namespace: dev
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: lop.localhost
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: lop-backend
+                port:
+                  number: 8000
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: lop-frontend
+                port:
+                  number: 3000

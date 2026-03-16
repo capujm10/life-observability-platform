@@ -236,6 +236,8 @@ The current manifests target a lightweight ingress-based k3s setup with:
 - `lop-backend`
 - `lop-frontend`
 
+For a local k3d or k3s development cluster that already has Traefik and Postgres running, see `deploy/k8s/local-dev/README.md`. That manifest set targets namespace `dev`, reuses `postgres.database.svc:5432`, and exposes the app at `http://lop.localhost:8080`.
+
 ### k3s Production Notes
 
 - Backend, frontend, and Postgres all include baseline readiness and liveness probes.
