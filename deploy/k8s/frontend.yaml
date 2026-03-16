@@ -19,7 +19,7 @@ spec:
       containers:
         - name: frontend
           # Replace :latest with a published Git SHA tag for real deployments.
-          image: ghcr.io/capujm10/life-observability-platform-frontend:latest
+          image: ghcr.io/capujm10/life-observability-platform-frontend:4f055c29907d7cb8a9c833a260d9005390b5ea5d
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
