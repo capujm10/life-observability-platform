@@ -48,6 +48,8 @@ cp deploy/k8s/secret.example.yaml deploy/k8s/secret.yaml
 kubectl apply -f deploy/k8s/secret.yaml
 ```
 
+Keep `deploy/k8s/secret.yaml` local and untracked. The committed template is `deploy/k8s/secret.example.yaml`.
+
 ## Step 3: Optional GHCR Pull Secret
 
 Only needed if the GHCR packages are private.
@@ -71,9 +73,9 @@ Then uncomment the `imagePullSecrets` block in:
 
 Before applying the ingress, replace `lop.example.com` in `deploy/k8s/ingress.yaml` with the real host for the deployment.
 
-## Step 5: Optional SHA Pinning
+## Step 5: Review the Pinned Image SHAs
 
-Before rollout, replace `:latest` with a specific Git SHA tag in:
+The manifests are already pinned to a published release SHA. Before rollout, confirm those tags are the ones you want to run, or replace them with a newer published Git SHA tag in:
 
 - `deploy/k8s/backend.yaml`
 - `deploy/k8s/frontend.yaml`

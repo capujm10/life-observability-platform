@@ -21,3 +21,4 @@ postgres_data/
 backend/.env
 frontend/.env.local
 frontend/.env
+deploy/k8s/secret.yaml
