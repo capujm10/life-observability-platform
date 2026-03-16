@@ -11,7 +11,20 @@ import {
   WeeklySummary,
 } from "@/lib/types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api/v1";
+const DEFAULT_API_BASE_PATH = "/api/v1";
+
+function resolveApiBaseUrl() {
+  const configuredApiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (configuredApiBaseUrl) {
+    return configuredApiBaseUrl;
+  }
+
+  if (typeof window !== "undefined") {
+    return `${window.location.origin}${DEFAULT_API_BASE_PATH}`;
+  }
+
+  return `http://localhost:8000${DEFAULT_API_BASE_PATH}`;
+}
 
 export class ApiError extends Error {
   status: number;
@@ -37,7 +50,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     headers.set("Authorization", `Bearer ${options.token}`);
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(`${resolveApiBaseUrl()}${path}`, {
     method: options.method ?? "GET",
     headers,
     body: options.body ? JSON.stringify(options.body) : undefined,
