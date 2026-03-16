@@ -209,6 +209,11 @@ The backend and frontend deployment manifests are already aligned with the publi
 - `ghcr.io/capujm10/life-observability-platform-backend:4f055c29907d7cb8a9c833a260d9005390b5ea5d`
 - `ghcr.io/capujm10/life-observability-platform-frontend:4f055c29907d7cb8a9c833a260d9005390b5ea5d`
 
+Current first-deployment hostname:
+
+- `http://186.177.187.155.nip.io`
+- API base URL: `http://186.177.187.155.nip.io/api/v1`
+
 Step-by-step deployment guide:
 
 - `deploy/k8s/DEPLOY.md`
@@ -217,12 +222,13 @@ Suggested apply order:
 
 1. Create the namespace.
 2. Copy `secret.example.yaml` to a real local `secret.yaml`, replace placeholder values, and apply that file.
-3. Customize the ingress host, real secrets, and confirm or update the pinned backend/frontend image SHAs before deployment.
+3. Confirm the ingress host, real secrets, and pinned backend/frontend image SHAs before deployment.
 4. Apply the PVC, Postgres, backend, frontend, and ingress manifests.
 
 If the GHCR packages remain private, create an image pull secret in the cluster and uncomment the `imagePullSecrets` block in `deploy/k8s/backend.yaml` and `deploy/k8s/frontend.yaml` before rollout.
 
 `deploy/k8s/secret.yaml` should remain local and untracked. `deploy/k8s/secret.example.yaml` is the committed template.
+The manifests expect the real secret name to be `lop-secret`.
 
 The current manifests target a lightweight ingress-based k3s setup with:
 
@@ -236,7 +242,7 @@ The current manifests target a lightweight ingress-based k3s setup with:
 - Backend and frontend ship with lightweight CPU and memory requests and limits, and Postgres now has a conservative starter resource budget as well.
 - Use published Git SHA tags for deployments; update the pinned manifest tags when promoting a newer release.
 - Uncomment `imagePullSecrets` only if the GHCR packages are private.
-- Before deployment, you still need to set real secrets, a real ingress host, and any cluster-specific TLS or pull-secret configuration.
+- Before deployment, you still need to set real secrets and any cluster-specific TLS or pull-secret configuration.
 
 ### Quick Deployment Flow
 
@@ -244,7 +250,7 @@ The current manifests target a lightweight ingress-based k3s setup with:
 2. Apply `deploy/k8s/namespace.yaml`.
 3. Create a real local `deploy/k8s/secret.yaml` from `deploy/k8s/secret.example.yaml`, then apply it with real values.
 4. Create a GHCR pull secret only if the packages are private, then enable `imagePullSecrets`.
-5. Update `deploy/k8s/ingress.yaml` with the real host.
+5. Confirm `deploy/k8s/ingress.yaml` and the secret URLs still match the current `nip.io` host.
 6. Apply `postgres-pvc.yaml`, `postgres.yaml`, `backend.yaml`, `frontend.yaml`, and `ingress.yaml` in that order.
 7. Verify pods, services, ingress, and rollout status with `kubectl get` and `kubectl rollout status`.
 8. Use `kubectl logs`, `kubectl describe`, and `kubectl get events` for troubleshooting.

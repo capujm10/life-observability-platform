@@ -42,22 +42,22 @@ spec:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: lop-app-secrets
+                  name: lop-secret
                   key: DATABASE_URL
             - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: lop-app-secrets
+                  name: lop-secret
                   key: SECRET_KEY
             - name: CORS_ORIGINS
               valueFrom:
                 secretKeyRef:
-                  name: lop-app-secrets
+                  name: lop-secret
                   key: CORS_ORIGINS
             - name: GITHUB_API_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: lop-app-secrets
+                  name: lop-secret
                   key: GITHUB_API_TOKEN
                   optional: true
           readinessProbe:

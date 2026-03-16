@@ -49,6 +49,7 @@ kubectl apply -f deploy/k8s/secret.yaml
 ```
 
 Keep `deploy/k8s/secret.yaml` local and untracked. The committed template is `deploy/k8s/secret.example.yaml`.
+The manifests expect the real secret name to be `lop-secret`.
 
 ## Step 3: Optional GHCR Pull Secret
 
@@ -69,9 +70,13 @@ Then uncomment the `imagePullSecrets` block in:
 - `deploy/k8s/backend.yaml`
 - `deploy/k8s/frontend.yaml`
 
-## Step 4: Update the Ingress Host
+## Step 4: Confirm the Ingress Host
 
-Before applying the ingress, replace `lop.example.com` in `deploy/k8s/ingress.yaml` with the real host for the deployment.
+The ingress is currently set to the first deployment hostname:
+
+- `186.177.187.155.nip.io`
+
+If the public endpoint changes later, update `deploy/k8s/ingress.yaml`, `CORS_ORIGINS`, and `NEXT_PUBLIC_API_BASE_URL` together.
 
 ## Step 5: Review the Pinned Image SHAs
 

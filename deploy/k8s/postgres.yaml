@@ -24,19 +24,13 @@ spec:
               name: postgres
           env:
             - name: POSTGRES_DB
-              valueFrom:
-                secretKeyRef:
-                  name: lop-app-secrets
-                  key: POSTGRES_DB
+              value: personal_os
             - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: lop-app-secrets
-                  key: POSTGRES_USER
+              value: postgres
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: lop-app-secrets
+                  name: lop-secret
                   key: POSTGRES_PASSWORD
           volumeMounts:
             - name: postgres-data
